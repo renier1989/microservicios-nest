@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as UuidV4 } from 'uuid'
 
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,18 +25,33 @@ export class ProductsService {
   }
 
   findAll() {
-    return `This action returns all products`;
+    return this.products;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  findOne(id: string):Product {
+    const product = this.products.find( prod => prod.id === id);
+    if(!product){
+      throw new NotFoundException(`Product with id ${id} not found.`);
+    }
+    return product;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  remove(id: string) {
+
+    const product = this.findOne(id);
+    this.products = this.products.filter(product => product.id !== id);
+    return {deletedProduct : product};
+
+    // const product = this.products.find( prod => prod.id === id);
+    // if(!product){
+    //   throw new NotFoundException(`Product with id ${id} not found.`);
+    // }
+    // this.products.splice( this.products.findIndex(p=>p.id === id), 1 );
+    // return `Product ${id} removed`;
+    
   }
 }
